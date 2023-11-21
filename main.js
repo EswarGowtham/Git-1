@@ -87,19 +87,49 @@ document.getElementById('my-form').addEventListener('submit', function (e) {
         email: email
       };
   
-      // Check if local storage already has users data
       var users = JSON.parse(localStorage.getItem('users')) || [];
-  
-      // Add the new user to the array
       users.push(user);
-  
-      // Store the updated array in local storage
       localStorage.setItem('users', JSON.stringify(users));
-  
-      // Clear the form fields
       document.getElementById('my-form').reset();
   
       // Display a success message
       showMessage('User added successfully', 'success');
+  
+      // Re-render the user list
+      renderUsers();
     }
   });
+  
+  function renderUsers() {
+    var usersList = document.getElementById('users');
+    usersList.innerHTML = '';
+  
+    var users = JSON.parse(localStorage.getItem('users')) || [];
+  
+    users.forEach(function (user, index) {
+      var li = document.createElement('li');
+      li.appendChild(document.createTextNode(`Name: ${user.name}, Email: ${user.email}`));
+  
+      var deleteButton = document.createElement('button');
+      deleteButton.innerText = 'Delete';
+      deleteButton.addEventListener('click', function () {
+        // Call the delete function with the index of the user to be deleted
+        deleteUser(index);
+      });
+  
+      li.appendChild(deleteButton);
+      usersList.appendChild(li);
+    });
+  }
+  
+  // Function to delete a user by index
+  function deleteUser(index) {
+    var users = JSON.parse(localStorage.getItem('users')) || [];
+    users.splice(index, 1);
+  
+    localStorage.setItem('users', JSON.stringify(users));
+    renderUsers();
+  }
+  
+  renderUsers();
+  
