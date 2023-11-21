@@ -109,7 +109,13 @@ document.getElementById('my-form').addEventListener('submit', function (e) {
     users.forEach(function (user, index) {
       var li = document.createElement('li');
       li.appendChild(document.createTextNode(`Name: ${user.name}, Email: ${user.email}`));
-  
+      var editButton = document.createElement('button');
+      editButton.innerText = 'Edit';
+      editButton.addEventListener('click', function () {
+      editUser(index);
+      });
+
+    li.appendChild(editButton);
       var deleteButton = document.createElement('button');
       deleteButton.innerText = 'Delete';
       deleteButton.addEventListener('click', function () {
@@ -130,6 +136,19 @@ document.getElementById('my-form').addEventListener('submit', function (e) {
     localStorage.setItem('users', JSON.stringify(users));
     renderUsers();
   }
+  function editUser(index) {
+    var users = JSON.parse(localStorage.getItem('users')) || [];
+
+    var userToEdit = users[index];
+
+    document.getElementById('name').value = userToEdit.name;
+    document.getElementById('email').value = userToEdit.email;
   
+    users.splice(index, 1);
+  
+    // Update the local storage with the modified users array
+    localStorage.setItem('users', JSON.stringify(users));
+    renderUsers();
+  }
   renderUsers();
   
