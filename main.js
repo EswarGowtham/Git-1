@@ -71,84 +71,163 @@
 
 // ********************************************New Task**********************************
 
+// document.getElementById('my-form').addEventListener('submit', function (e) {
+//     e.preventDefault(); // Prevent the default form submission
+  
+//     // Get user input values
+//     var name = document.getElementById('name').value;
+//     var email = document.getElementById('email').value;
+  
+//     if (name === '' || email === '') {
+//       showMessage('Please fill in all fields', 'error');
+//     } else {
+//       // Create an object to represent a user
+//       var user = {
+//         name: name,
+//         email: email
+//       };
+  
+//       var users = JSON.parse(localStorage.getItem('users')) || [];
+//       users.push(user);
+//       localStorage.setItem('users', JSON.stringify(users));
+//       document.getElementById('my-form').reset();
+  
+//       // Display a success message
+//       showMessage('User added successfully', 'success');
+  
+//       // Re-render the user list
+//       renderUsers();
+//     }
+//   });
+  
+//   function renderUsers() {
+//     var usersList = document.getElementById('users');
+//     usersList.innerHTML = '';
+  
+//     var users = JSON.parse(localStorage.getItem('users')) || [];
+  
+//     users.forEach(function (user, index) {
+//       var li = document.createElement('li');
+//       li.appendChild(document.createTextNode(`Name: ${user.name}, Email: ${user.email}`));
+//       var editButton = document.createElement('button');
+//       editButton.innerText = 'Edit';
+//       editButton.addEventListener('click', function () {
+//       editUser(index);
+//       });
+
+//     li.appendChild(editButton);
+//       var deleteButton = document.createElement('button');
+//       deleteButton.innerText = 'Delete';
+//       deleteButton.addEventListener('click', function () {
+//         // Call the delete function with the index of the user to be deleted
+//         deleteUser(index);
+//       });
+  
+//       li.appendChild(deleteButton);
+//       usersList.appendChild(li);
+//     });
+//   }
+  
+//   // Function to delete a user by index
+//   function deleteUser(index) {
+//     var users = JSON.parse(localStorage.getItem('users')) || [];
+//     users.splice(index, 1);
+  
+//     localStorage.setItem('users', JSON.stringify(users));
+//     renderUsers();
+//   }
+//   function editUser(index) {
+//     var users = JSON.parse(localStorage.getItem('users')) || [];
+
+//     var userToEdit = users[index];
+
+//     document.getElementById('name').value = userToEdit.name;
+//     document.getElementById('email').value = userToEdit.email;
+  
+//     users.splice(index, 1);
+  
+//     // Update the local storage with the modified users array
+//     localStorage.setItem('users', JSON.stringify(users));
+//     renderUsers();
+//   }
+//   renderUsers();
+//***************************************************************Expense Tracker************************************************** */
 document.getElementById('my-form').addEventListener('submit', function (e) {
-    e.preventDefault(); // Prevent the default form submission
-  
-    // Get user input values
-    var name = document.getElementById('name').value;
-    var email = document.getElementById('email').value;
-  
-    if (name === '' || email === '') {
+  e.preventDefault(); // Prevent the default form submission
+
+  // Get user input values
+  var name = document.getElementById('name').value;
+  var amount = document.getElementById('amount').value;
+  var category = document.getElementById('category').value;
+
+  if (name === '' || amount === '') {
       showMessage('Please fill in all fields', 'error');
-    } else {
+  } else {
       // Create an object to represent a user
       var user = {
-        name: name,
-        email: email
+          name: name,
+          amount: amount,
+          category: category
       };
-  
+
       var users = JSON.parse(localStorage.getItem('users')) || [];
       users.push(user);
       localStorage.setItem('users', JSON.stringify(users));
-      document.getElementById('my-form').reset();
-  
-      // Display a success message
-      showMessage('User added successfully', 'success');
-  
+
       // Re-render the user list
       renderUsers();
-    }
-  });
-  
-  function renderUsers() {
-    var usersList = document.getElementById('users');
-    usersList.innerHTML = '';
-  
-    var users = JSON.parse(localStorage.getItem('users')) || [];
-  
-    users.forEach(function (user, index) {
-      var li = document.createElement('li');
-      li.appendChild(document.createTextNode(`Name: ${user.name}, Email: ${user.email}`));
-      var editButton = document.createElement('button');
-      editButton.innerText = 'Edit';
-      editButton.addEventListener('click', function () {
+      // Reset the form
+      document.getElementById('my-form').reset();
+  }
+});
+function renderUsers() {
+  var usersList = document.getElementById('users');
+  usersList.innerHTML = '';
+
+  var users = JSON.parse(localStorage.getItem('users')) || [];
+
+  users.forEach(function (user, index) {
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(` ${user.name} - ${user.amount} - ${user.category}`));
+
+    var editButton = document.createElement('button');
+    editButton.innerText = 'Edit';
+    editButton.addEventListener('click', function () {
       editUser(index);
-      });
+    });
 
     li.appendChild(editButton);
-      var deleteButton = document.createElement('button');
-      deleteButton.innerText = 'Delete';
-      deleteButton.addEventListener('click', function () {
-        // Call the delete function with the index of the user to be deleted
-        deleteUser(index);
-      });
-  
-      li.appendChild(deleteButton);
-      usersList.appendChild(li);
+
+    var deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Delete';
+    deleteButton.addEventListener('click', function () {
+      // Call the delete function with the index of the user to be deleted
+      deleteUser(index);
     });
-  }
-  
-  // Function to delete a user by index
-  function deleteUser(index) {
-    var users = JSON.parse(localStorage.getItem('users')) || [];
-    users.splice(index, 1);
-  
-    localStorage.setItem('users', JSON.stringify(users));
-    renderUsers();
-  }
-  function editUser(index) {
-    var users = JSON.parse(localStorage.getItem('users')) || [];
 
-    var userToEdit = users[index];
+    li.appendChild(deleteButton);
+    usersList.appendChild(li);
+  });
+}
+function deleteUser(index) {
+  var users = JSON.parse(localStorage.getItem('users')) || [];
+  users.splice(index, 1);
 
-    document.getElementById('name').value = userToEdit.name;
-    document.getElementById('email').value = userToEdit.email;
-  
-    users.splice(index, 1);
-  
-    // Update the local storage with the modified users array
-    localStorage.setItem('users', JSON.stringify(users));
-    renderUsers();
-  }
+  localStorage.setItem('users', JSON.stringify(users));
   renderUsers();
-  
+}
+function editUser(index) {
+  var users = JSON.parse(localStorage.getItem('users')) || [];
+
+  var userToEdit = users[index];
+
+  document.getElementById('name').value = userToEdit.name;
+  document.getElementById('amount').value = userToEdit.amount;
+  document.getElementById('category').value = userToEdit.category;
+  users.splice(index, 1);
+
+  // Update the local storage with the modified users array
+  localStorage.setItem('users', JSON.stringify(users));
+  renderUsers();
+}
+renderUsers();
