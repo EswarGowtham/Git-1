@@ -70,10 +70,9 @@
 
 
 // ********************************************New Task**********************************
-
 // document.getElementById('my-form').addEventListener('submit', function (e) {
-//     e.preventDefault(); // Prevent the default form submission
-  
+//   e.preventDefault(); 
+
 //     // Get user input values
 //     var name = document.getElementById('name').value;
 //     var email = document.getElementById('email').value;
@@ -128,29 +127,29 @@
 //     });
 //   }
   
-//   // Function to delete a user by index
-//   function deleteUser(index) {
-//     var users = JSON.parse(localStorage.getItem('users')) || [];
-//     users.splice(index, 1);
+  // Function to delete a user by index
+  // function deleteUser(index) {
+  //   var users = JSON.parse(localStorage.getItem('users')) || [];
+  //   users.splice(index, 1);
   
-//     localStorage.setItem('users', JSON.stringify(users));
-//     renderUsers();
-//   }
-//   function editUser(index) {
-//     var users = JSON.parse(localStorage.getItem('users')) || [];
+  //   localStorage.setItem('users', JSON.stringify(users));
+  //   renderUsers();
+  // }
+  // function editUser(index) {
+  //   var users = JSON.parse(localStorage.getItem('users')) || [];
 
-//     var userToEdit = users[index];
+  //   var userToEdit = users[index];
 
-//     document.getElementById('name').value = userToEdit.name;
-//     document.getElementById('email').value = userToEdit.email;
+  //   document.getElementById('name').value = userToEdit.name;
+  //   document.getElementById('email').value = userToEdit.email;
   
-//     users.splice(index, 1);
+  //   users.splice(index, 1);
   
-//     // Update the local storage with the modified users array
-//     localStorage.setItem('users', JSON.stringify(users));
-//     renderUsers();
-//   }
-//   renderUsers();
+  //   // Update the local storage with the modified users array
+  //   localStorage.setItem('users', JSON.stringify(users));
+  //   renderUsers();
+  // }
+  // renderUsers();
 //***************************************************************Expense Tracker************************************************** */
 document.getElementById('my-form').addEventListener('submit', function (e) {
   e.preventDefault(); // Prevent the default form submission
