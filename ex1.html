@@ -7,7 +7,7 @@
     <style>
         body {
             display: flex;
-            
+
             height: 100vh;
             margin: 0;
         }
@@ -85,7 +85,6 @@
             .catch((err)=>{console.log(err)})
             const formListContainer = document.getElementById('form-list');
             formListContainer.innerHTML = '';
-
             const formDataList = JSON.parse(localStorage.getItem('formData')) || [];
 
             formDataList.forEach((formData, index) => {
@@ -102,9 +101,15 @@
         }
 
         function deleteForm(index) {
+            //axios.delete(apiEndpoint)
+            //.then(response => {console.log('User deleted successfully:', response.data);this.parentNode.remove();})
+            //.catch(error => {console.error('Error deleting user:', error);});
             const formDataList = JSON.parse(localStorage.getItem('formData')) || [];
             formDataList.splice(index, 1);
             localStorage.setItem('formData', JSON.stringify(formDataList));
+            axios.delete("https://crudcrud.com/api/5caa4d6abef04a9bb006a704b00d357f/data")
+            .then(response => {console.log('User deleted successfully:', response.data);this.parentNode.remove();})
+            .catch(error => {console.error('Error deleting user:', error);});
             displayFormList();
         }
 
