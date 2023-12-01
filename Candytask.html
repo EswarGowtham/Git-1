@@ -7,7 +7,6 @@
         body {
             font-family: Arial, sans-serif;
         }
-
         form {
             display: flex;
             flex-direction: row;
@@ -38,9 +37,9 @@
         }
     </style>
     <script>
-        function updateQuantity(value) {
-            var quantityInput = document.getElementById('quantity');
-            var quantity = parseInt(quantityInput.value, 10);
+        function updateQuantity(value, detailId) {
+            var quantitySpan = document.getElementById(`displayed-quantity-${detailId}`);
+            var quantity = parseInt(quantitySpan.innerText, 10);
             var updatedQuantity = quantity - value;
 
             if (updatedQuantity < 0) {
@@ -48,14 +47,29 @@
                 return;
             }
 
-            quantityInput.value = updatedQuantity;
+            quantitySpan.innerText = updatedQuantity;
             document.getElementById('error-message').innerText = '';
-
-            // Update displayed details
-            var displayedQuantity = document.getElementById('displayed-quantity');
-            displayedQuantity.innerText = updatedQuantity;
+            var storedDetails = localStorage.getItem('productDetails');
+            
+            if (storedDetails) {
+                var allDetails = JSON.parse(storedDetails);
+                for (var i = 0; i < allDetails.length; i++) { 
+                    if (allDetails[i].name === detailId) {
+                        allDetails[i].quantity = updatedQuantity;
+                        var detailsToUpdate = {
+                            _id: allDetails[i]._id, 
+                            name: allDetails[i].name,
+                          
+                            quantity: updatedQuantity
+                        };
+                        saveDetailsToCrud(detailsToUpdate);
+                        break
+                        break;
+                    }
+                }
+                localStorage.setItem('productDetails', JSON.stringify(allDetails));
+            }
         }
-
         function validateQuantity() {
             var quantity = parseInt(document.getElementById('quantity').value, 10);
 
@@ -67,41 +81,21 @@
                 return true;
             }
         }
-
-        function displayDetails(details) {
-            var resultDiv = document.getElementById('result');
-            var detailId = 'detail-' + details.name.replace(/\s+/g, '-'); // Generate a unique ID
-
-            resultDiv.innerHTML += `<div id="${detailId}">
-                                       <p><strong>Name:</strong> ${details.name} | 
-                                       <strong>Description:</strong> ${details.description} | 
-                                       <strong>Price:</strong> ${details.price} | 
-                                       <strong>Quantity:</strong> <span id="displayed-quantity-${detailId}">${details.quantity}</span> |
-                                       <button type="button" onclick="updateQuantity(1)">Buy 1</button>
-                                       <button type="button" onclick="updateQuantity(2)">Buy 2</button>
-                                       <button type="button" onclick="updateQuantity(3)">Buy 3</button>
-                                       <button type="button" onclick="deleteDetails('${detailId}')">Delete</button></p>
-                                   </div>`;
-        }
-
-        function deleteDetails(detailId) {
-            var detailElement = document.getElementById(detailId);
-            if (detailElement) {
-                detailElement.remove();
-            }
-        }
-
         function saveDetails(details) {
-            // Load existing details from localStorage
             var storedDetails = localStorage.getItem('productDetails');
 
             var allDetails = [];
             if (storedDetails) {
                 allDetails = JSON.parse(storedDetails);
             }
-
             // Add the new details to the list
-            allDetails.push(details);
+            var new_detail = {
+                name: details.name,
+                description: details.description,
+                price: details.price,
+                quantity: details.quantity
+            };
+            allDetails.push(new_detail);
 
             // Save the updated details list in localStorage
             localStorage.setItem('productDetails', JSON.stringify(allDetails));
@@ -110,15 +104,9 @@
         function loadDetails() {
             // Load existing details from localStorage
             var storedDetails = localStorage.getItem('productDetails');
-
-            console.log('Stored Details:', storedDetails);  // Check the console
-
             try {
-                // Attempt to parse the stored details
                 var allDetails = JSON.parse(storedDetails);
-
                 if (Array.isArray(allDetails)) {
-                    // Display all existing details
                     allDetails.forEach(displayDetails);
                 } else if (typeof allDetails === 'object' && allDetails !== null) {
                     // Convert object to array and display details
@@ -149,62 +137,104 @@
                 // Display and save the new details
                 displayDetails(details);
                 saveDetails(details);
+                saveDetailsToCrud(details);
             }
             return false; // Ensure the form does not actually submit
         }
         function saveDetailsToCrud(details) {
-            // Replace 'your-api-endpoint' with the actual endpoint of your CRUD backend
-            var apiEndpoint = 'https://crudcrud.com/api/50f04c8f62b341ce84f3f2aacad9f61c/details';
-        
+            var apiEndpoint = 'https://crudcrud.com/api/50f04c8f62b341ce84f3f2aacad9f61c/New_data';
             fetch(apiEndpoint, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(details),
+            })
+            .then(response => response.json())
+            .then(existingData => {
+                const existingDetail = existingData.find(item => item.name === details.name);
+                if (existingDetail) {
+                    // Data already exists, perform a PUT request to update it
+                    return fetch(`${apiEndpoint}/${existingDetail._id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(details),
+                    });
+                } else {
+                    // Data doesn't exist, perform a POST request to create it
+                    return fetch(apiEndpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(details),
+                    });
+                }
             })
             .then(response => response.json())
             .then(data => {
                 console.log('Data saved to CRUD:', data);
-                // You can add additional logic here if needed
             })
             .catch(error => {
                 console.error('Error saving data to CRUD:', error);
             });
         }
         
-        // Example of using saveDetailsToCrud
-        var details = {
-            name: 'Snickers',
-            description: 'choco',
-            price: '15',
-            quantity: '2'
-        };
-        
-        
-        
         function displayDetails(details) {
             var resultDiv = document.getElementById('result');
-            resultDiv.innerHTML += `<p><strong>Name:</strong> ${details.name} | 
-                                   <strong>Description:</strong> ${details.description} | 
-                                   <strong>Price:</strong> ${details.price} | 
-                                   <strong>Quantity:</strong> <span id="displayed-quantity">${details.quantity}</span> |
-                                   <button type="button" onclick="updateQuantity(1)">Buy 1</button>
-                                   <button type="button" onclick="updateQuantity(2)">Buy 2</button>
-                                   <button type="button" onclick="updateQuantity(3)">Buy 3</button>
-                                   <button type="button" onclick="deleteDetails(this)">Delete</button></p>`;
+            var detailId = details.name.replace(/\s+/g, '-'); // Generate a unique ID
+
+            resultDiv.innerHTML += `<div id="${detailId}">
+                                       <p><strong>Name:</strong> ${details.name} | 
+                                       <strong>Description:</strong> ${details.description} | 
+                                       <strong>Price:</strong> ${details.price} | 
+                                       <strong>Quantity:</strong> <span id="displayed-quantity-${detailId}">${details.quantity}</span> |
+                                       <button type="button" onclick="updateQuantity(1, '${detailId}')">Buy 1</button>
+                                       <button type="button" onclick="updateQuantity(2, '${detailId}')">Buy 2</button>
+                                       <button type="button" onclick="updateQuantity(3, '${detailId}')">Buy 3</button>
+                                       <button type="button" onclick="deleteDetails('${detailId}')">Delete</button></p>
+                                   </div>`;
         }
+        function deleteDetails(detailId) {
+            var detailElement = document.getElementById(detailId);
+            var storedDetails = localStorage.getItem('productDetails');
+            
+            if (detailElement && storedDetails) {
+                var allDetails = JSON.parse(storedDetails);
         
-        function deleteDetails(button) {
-            var detailElement = button.closest('p');
-            if (detailElement) {
+                for (var i = 0; i < allDetails.length; i++) { 
+                    if (allDetails[i].name === detailId) {
+                        allDetails.splice(i, 1); 
+                        break;
+                    }
+                }
+        
                 detailElement.remove();
+                localStorage.setItem('productDetails', JSON.stringify(allDetails));
+                var apiEndpoint = 'https://crudcrud.com/api/50f04c8f62b341ce84f3f2aacad9f61c/New_data';
+                fetch(`${apiEndpoint}/${detailId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Data deleted from CRUD API');
+                    } else {
+                        console.error('Failed to delete data from CRUD API');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting data from CRUD API:', error);
+                });
+                
             }
-        }
-        
-        saveDetailsToCrud(details);
-        // Load existing details on page load
+        }   
+
         window.onload = loadDetails;
+
     </script>
     <title>Product Form</title>
 </head>
@@ -231,8 +261,9 @@
     <p id="error-message"></p>
 
     <div id="result">
+
         <h2>Details</h2>
-        <!-- Details will be displayed here -->
+
     </div>
 
 </body>
