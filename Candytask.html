@@ -120,7 +120,7 @@
             }
         }
         function handleSubmit(event) {
-            event.preventDefault(); // Prevent the default form submission behavior
+            event.preventDefault(); 
             if (validateQuantity()) {
                 var name = document.getElementById('name').value;
                 var description = document.getElementById('description').value;
@@ -142,7 +142,7 @@
             return false; // Ensure the form does not actually submit
         }
         function saveDetailsToCrud(details) {
-            var apiEndpoint = 'https://crudcrud.com/api/50f04c8f62b341ce84f3f2aacad9f61c/New_data';
+            var apiEndpoint = 'https://crudcrud.com/api/e1fa464471714852a8ada29c6e0051df/data';
             fetch(apiEndpoint, {
                 method: 'GET',
                 headers: {
@@ -183,7 +183,7 @@
         
         function displayDetails(details) {
             var resultDiv = document.getElementById('result');
-            var detailId = details.name.replace(/\s+/g, '-'); // Generate a unique ID
+            var detailId = details.name; // Generate a unique ID
 
             resultDiv.innerHTML += `<div id="${detailId}">
                                        <p><strong>Name:</strong> ${details.name} | 
@@ -212,7 +212,7 @@
         
                 detailElement.remove();
                 localStorage.setItem('productDetails', JSON.stringify(allDetails));
-                var apiEndpoint = 'https://crudcrud.com/api/50f04c8f62b341ce84f3f2aacad9f61c/New_data';
+                var apiEndpoint = 'https://crudcrud.com/api/e1fa464471714852a8ada29c6e0051df/data';
                 fetch(`${apiEndpoint}/${detailId}`, {
                     method: 'DELETE',
                     headers: {
