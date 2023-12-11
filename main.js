@@ -168,6 +168,17 @@ document.getElementById('my-form').addEventListener('submit', function (e) {
           amount: amount,
           category: category
       };
+      axios.post('https://crudcrud.com/api/fd7eb3c25ace4100a26f64edd0e6c491/data', user)
+        .then(function (response) {
+            // Handle the response if needed
+            console.log(response.data);
+            renderUsers();
+            document.getElementById('my-form').reset();
+        })
+        .catch(function (error) {
+            console.error('Error creating user:', error);
+        });
+      
 
       var users = JSON.parse(localStorage.getItem('users')) || [];
       users.push(user);
