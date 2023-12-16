@@ -169,40 +169,37 @@ document.addEventListener('DOMContentLoaded', function () {
             category: category
         };
       }
-      
+
         if (flag !== null) {
           try {
    
             axios.put(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/${flag}`, user);
             flag = null;
             console.log('User updated successfully');
-            renderUsers()
+           
           } catch (error) {
             console.error('Error updating user:', error);
           }
         } else {
           try {
             axios.post(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data`, user);
-            renderUsers()
+          
           } catch (error) {
             console.error('Error creating user:', error);
           }
         }
+        renderUsers()
         document.getElementById('my-form').reset();
       })
     })
-
-      
-
         // var users = JSON.parse(localStorage.getItem('users')) || [];
         // users.push(user);
-        // localStorage.setItem('users', JSON.stringify(users));
-
+        // localStorage.setItem('users', JSON.stringify(users))
         //renderUsers();
         
-        
-    
-  
+
+
+
 
   async function renderUsers() {
     var usersList = document.getElementById('users');
@@ -220,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editButton.innerText = 'Edit';
         editButton.addEventListener('click', function () {
           editUser(index);
+          
         });
 
         li.appendChild(editButton);
@@ -227,7 +225,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var deleteButton = document.createElement('button');
         deleteButton.innerText = 'Delete';
         deleteButton.addEventListener('click', function () {
-          deleteUser(user.id);
+          deleteUser(index);
+          
         });
 
         li.appendChild(deleteButton);
@@ -241,27 +240,25 @@ document.addEventListener('DOMContentLoaded', function () {
   async function deleteUser(index) {
     var users = await getUsersFromApi();
     var userToDelete = users[index];
-    var id=parseInt(userToDelete)
     try {
-      await axios.delete(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/${id}`);
+      axios.delete(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/${userToDelete._id}`);
     } catch (error) {
       console.error('Error deleting user:', error);
     }
+    renderUsers()
   }
 
   async function editUser(index) {
     var users = await getUsersFromApi();
     var userToEdit = users[index];
-    console.log(users)
     flag=userToEdit._id
     document.getElementById('name').value = userToEdit.name;
     document.getElementById('amount').value = userToEdit.amount;
     document.getElementById('category').value = userToEdit.category; 
-
     userToEdit.name = document.getElementById('name').value;
     userToEdit.amount = document.getElementById('amount').value;
     userToEdit.category = document.getElementById('category').value;
-
+    renderUsers()
   }
 
   async function getUsersFromApi() {
