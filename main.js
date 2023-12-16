@@ -151,93 +151,179 @@
   // }
   // renderUsers();
 //***************************************************************Expense Tracker************************************************** */
-document.getElementById('my-form').addEventListener('submit', function (e) {
-  e.preventDefault(); // Prevent the default form submission
+var flag=null
+document.addEventListener('DOMContentLoaded', function () {
+  
+  document.getElementById('my-form').addEventListener('submit', function (e) {
+    e.preventDefault()
+    var name = document.getElementById('name').value;
+    var amount = document.getElementById('amount').value;
+    var category = document.getElementById('category').value;
 
-  // Get user input values
-  var name = document.getElementById('name').value;
-  var amount = document.getElementById('amount').value;
-  var category = document.getElementById('category').value;
-
-  if (name === '' || amount === '') {
-      showMessage('Please fill in all fields', 'error');
-  } else {
-      // Create an object to represent a user
-      var user = {
-          name: name,
-          amount: amount,
-          category: category
-      };
-      axios.post('https://crudcrud.com/api/fd7eb3c25ace4100a26f64edd0e6c491/data', user)
-        .then(function (response) {
-            // Handle the response if needed
-            console.log(response.data);
-            renderUsers();
-            document.getElementById('my-form').reset();
-        })
-        .catch(function (error) {
+    if (name === '' || amount === '') {
+        showMessage('Please fill in all fields', 'error');
+    } else {
+        var user = {
+            name: name,
+            amount: amount,
+            category: category
+        };
+      }
+      
+        if (flag !== null) {
+          try {
+   
+            axios.put(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/${flag}`, user);
+            flag = null;
+            console.log('User updated successfully');
+            renderUsers()
+          } catch (error) {
+            console.error('Error updating user:', error);
+          }
+        } else {
+          try {
+            axios.post(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data`, user);
+            renderUsers()
+          } catch (error) {
             console.error('Error creating user:', error);
-        });
+          }
+        }
+        document.getElementById('my-form').reset();
+      })
+    })
+
       
 
-      var users = JSON.parse(localStorage.getItem('users')) || [];
-      users.push(user);
-      localStorage.setItem('users', JSON.stringify(users));
+        // var users = JSON.parse(localStorage.getItem('users')) || [];
+        // users.push(user);
+        // localStorage.setItem('users', JSON.stringify(users));
 
-      // Re-render the user list
-      renderUsers();
-      // Reset the form
-      document.getElementById('my-form').reset();
+        //renderUsers();
+        
+        
+    
+  
+
+  async function renderUsers() {
+    var usersList = document.getElementById('users');
+    usersList.innerHTML = '';
+    try {
+      const response = await axios.get(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data`);
+      
+      var users = response.data || [];
+
+      users.forEach(function (user, index) {
+        var li = document.createElement('li');
+        li.appendChild(document.createTextNode(` ${user.name} - ${user.amount} - ${user.category}`));
+
+        var editButton = document.createElement('button');
+        editButton.innerText = 'Edit';
+        editButton.addEventListener('click', function () {
+          editUser(index);
+        });
+
+        li.appendChild(editButton);
+
+        var deleteButton = document.createElement('button');
+        deleteButton.innerText = 'Delete';
+        deleteButton.addEventListener('click', function () {
+          deleteUser(user.id);
+        });
+
+        li.appendChild(deleteButton);
+        usersList.appendChild(li);
+      });
+    } catch (error) {
+      console.error('Error fetching data from API:', error);
+    }
   }
-});
-function renderUsers() {
-  var usersList = document.getElementById('users');
-  usersList.innerHTML = '';
 
-  var users = JSON.parse(localStorage.getItem('users')) || [];
+  async function deleteUser(index) {
+    var users = await getUsersFromApi();
+    var userToDelete = users[index];
+    var id=parseInt(userToDelete)
+    try {
+      await axios.delete(`https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/${id}`);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  }
 
-  users.forEach(function (user, index) {
-    var li = document.createElement('li');
-    li.appendChild(document.createTextNode(` ${user.name} - ${user.amount} - ${user.category}`));
+  async function editUser(index) {
+    var users = await getUsersFromApi();
+    var userToEdit = users[index];
+    console.log(users)
+    flag=userToEdit._id
+    document.getElementById('name').value = userToEdit.name;
+    document.getElementById('amount').value = userToEdit.amount;
+    document.getElementById('category').value = userToEdit.category; 
 
-    var editButton = document.createElement('button');
-    editButton.innerText = 'Edit';
-    editButton.addEventListener('click', function () {
-      editUser(index);
-    });
+    userToEdit.name = document.getElementById('name').value;
+    userToEdit.amount = document.getElementById('amount').value;
+    userToEdit.category = document.getElementById('category').value;
 
-    li.appendChild(editButton);
+  }
 
-    var deleteButton = document.createElement('button');
-    deleteButton.innerText = 'Delete';
-    deleteButton.addEventListener('click', function () {
-      // Call the delete function with the index of the user to be deleted
-      deleteUser(index);
-    });
+  async function getUsersFromApi() {
+    try {
+      const response = await axios.get('https://crudcrud.com/api/9ca216b9c34c497c968973ee0dc53c51/data/');
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching data from API:', error);
+      return [];
+    }
+  }
+  renderUsers()
 
-    li.appendChild(deleteButton);
-    usersList.appendChild(li);
-  });
-}
-function deleteUser(index) {
-  var users = JSON.parse(localStorage.getItem('users')) || [];
-  users.splice(index, 1);
 
-  localStorage.setItem('users', JSON.stringify(users));
-  renderUsers();
-}
-function editUser(index) {
-  var users = JSON.parse(localStorage.getItem('users')) || [];
+// function renderUsers() {
+//   var usersList = document.getElementById('users');
+//   usersList.innerHTML = '';
 
-  var userToEdit = users[index];
+//   var users = JSON.parse(localStorage.getItem('users')) || [];
 
-  document.getElementById('name').value = userToEdit.name;
-  document.getElementById('amount').value = userToEdit.amount;
-  document.getElementById('category').value = userToEdit.category;
-  users.splice(index, 1);
+//   users.forEach(function (user, index) {
+//     var li = document.createElement('li');
+//     li.appendChild(document.createTextNode(` ${user.name} - ${user.amount} - ${user.category}`));
 
-  // Update the local storage with the modified users array
-  localStorage.setItem('users', JSON.stringify(users));
-  renderUsers();
-}
-renderUsers();
+//     var editButton = document.createElement('button');
+//     editButton.innerText = 'Edit';
+//     editButton.addEventListener('click', function () {
+//       editUser(index);
+//     });
+
+//     li.appendChild(editButton);
+
+//     var deleteButton = document.createElement('button');
+//     deleteButton.innerText = 'Delete';
+//     deleteButton.addEventListener('click', function () {
+//       // Call the delete function with the index of the user to be deleted
+//       deleteUser(index);
+//     });
+
+//     li.appendChild(deleteButton);
+//     usersList.appendChild(li);
+//   });
+// }
+// function deleteUser(index) {
+//   var users = JSON.parse(localStorage.getItem('users')) || [];
+//   users.splice(index, 1);
+
+//   localStorage.setItem('users', JSON.stringify(users));
+//   renderUsers();
+// }
+// function editUser(index) {
+//   var users = JSON.parse(localStorage.getItem('users')) || [];
+
+//   var userToEdit = users[index];
+
+//   document.getElementById('name').value = userToEdit.name;
+//   document.getElementById('amount').value = userToEdit.amount;
+//   document.getElementById('category').value = userToEdit.category;
+//   users.splice(index, 1);
+
+//   // Update the local storage with the modified users array
+//   localStorage.setItem('users', JSON.stringify(users));
+//   renderUsers();
+// }
+// renderUsers();
