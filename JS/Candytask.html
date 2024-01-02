@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            width: 100px;
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        input {
+            width: 150px;
+        }
+
+        button {
+            margin-left: 10px;
+        }
+
+        #error-message {
+            color: red;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+    
+    <title>Product Form</title>
+</head>
+<body>
+
+    <h1>Product Information</h1>
+
+    <form id="productForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+
+        <label for="price">Price:</label>
+        <input type="text" id="price" name="price" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="0" required>
+
+        <button type="submit">Add Item</button>
+    </form>
+
+    <p id="error-message"></p>
+
+    <div id="result">
+
+        <h2>Details</h2>
+
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script>
+
+        const apiEndpoint = 'https://crudcrud.com/api/8e13680095c1416a9d1bf0f48a754b12/data';
+
+
+        (async function(){
+
+            const result = await axios.get(`${apiEndpoint}`)
+            // console.log(result);
+
+            result.data.forEach(candy => {
+                displayDetails(candy)
+            })
+        })()
+
+        function validateQuantity() {
+                var quantity = parseInt(document.getElementById('quantity').value, 10);
+
+                if (quantity < 0) {
+                    document.getElementById('error-message').innerText = 'Error: Quantity cannot be less than 0.';
+                    return false;
+                } else {
+                    document.getElementById('error-message').innerText = '';
+                    return true;
+                }
+            }
+        async function addItemToCrud(details) {
+                try {
+                    const createResponse = await axios.post(apiEndpoint, details);
+                    console.log('Data saved to CRUD:', createResponse.data);
+                    displayDetails(createResponse.data);
+                } catch (error) {
+                    console.error('Error adding data to CRUD:', error);
+                }
+            }
+
+        function createBuyButton(quantity, dataItem) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                const obj = JSON.parse(dataItem)
+                button.classList.add('buy-button');
+                button.classList.add(`id-${obj._id}`)
+                button.dataset.quantity = quantity;
+                button.dataset.item = dataItem;
+                // console.log("dataItem",dataItem);
+                button.textContent = `Buy ${quantity}`;
+
+
+
+                return button;
+            }
+
+
+        function displayDetails(info) {
+
+                var item = info
+                // console.log(item)
+                var v = JSON.stringify(item)
+                const itemDiv = document.createElement('div');
+                itemDiv.id = item._id;
+
+                itemDiv.innerHTML = `<p><strong>Name:</strong> ${item.name} | 
+                                        <strong>Description:</strong> ${item.description} | 
+                                        <strong>Price:</strong> ${item.price} | 
+                                        <strong>Quantity:</strong> <span id="displayed-quantity-${item._id}">${item.quantity}</span> |` 
+    
+                const buyButton1 = createBuyButton(1, v);
+                const buyButton2 = createBuyButton(2, v);
+                const buyButton3 = createBuyButton(3, v);
+
+                itemDiv.appendChild(buyButton1);
+                itemDiv.appendChild(buyButton2);
+                itemDiv.appendChild(buyButton3);
+
+                resultDiv.appendChild(itemDiv);
+
+                
+
+            }
+        var resultDiv = document.getElementById("result")
+
+        function handleSubmit(event) {
+            event.preventDefault()
+            if (validateQuantity()) {
+                var name = document.getElementById('name').value;
+                var description = document.getElementById('description').value;
+                var price = document.getElementById('price').value;
+                var quantity = document.getElementById('quantity').value;
+                var details = {
+                    name: name,
+                    description: description,
+                    price: price,
+                    quantity: quantity
+                };
+                addItemToCrud(details);
+                document.getElementById('productForm').reset();
+
+            }
+        }
+
+        async function updateQuantity(value, details , button) {
+                try {
+                    var d = JSON.parse(details)
+                    var id = d._id
+                    var quantitySpan = document.getElementById(`displayed-quantity-${d._id}`);
+
+                    var quantity = parseInt(quantitySpan.textContent, 10);
+                    var updatedQuantityValue = d.quantity - value;
+
+                    if (updatedQuantityValue < 0) {
+                        document.getElementById('error-message').innerText = 'Error: Quantity cannot be less than 0.';
+                        return;
+                    }
+                    quantitySpan.innerText = updatedQuantityValue;
+                    d.quantity = `${updatedQuantityValue}`
+                    
+                    document.getElementById('error-message').innerText = '';
+                    
+                    
+                    const buttons = document.querySelectorAll(`.id-${d._id}`)
+                    
+                    buttons.forEach(button => {
+                        button.dataset.item = JSON.stringify(d);
+                    })
+
+                    delete d._id;
+                    console.log(d);
+                    const updateResponse = await axios.put(`${apiEndpoint}/${id}`, d);
+                } catch (error) {
+                    console.error('Error updating Quantity:', error);
+                }
+            }
+        console.log(resultDiv)
+        document.getElementById('result').addEventListener("click", (event) => {
+            event.preventDefault()
+            if (event.target.classList.contains("buy-button")) {
+                console.log(`Cicked ${event.target.dataset.quantity}`)
+                console.log(JSON.parse(event.target.dataset.item));
+                updateQuantity(event.target.dataset.quantity, event.target.dataset.item , event.target)
+            }
+        })
+        document.getElementById('productForm').addEventListener('submit', handleSubmit)
+  
+    </script>
+</body>
+</html>

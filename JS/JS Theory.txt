@@ -1,0 +1,59 @@
+1. Hoisting in JavaScript is a process in which all the Variables, Functions are declared BEFORE execution of the code 
+3. Variables are initialised to UNDEFINED when they are declared and Function defination is stored AS IT IS.
+4. They are declared in Memory Allocation Phase in the Memory Component of Execution Context, so we can use them even BEFORE they are declared.
+5. UNDEFINED means Variable has been declared but value is not ASSIGNED but NOT DEFINED means Variables is NOT DECLARED.
+
+Lexical: when you declare a variable inside a function or a block of code, that variable is accessible only within that function or block and any nested functions
+or blocks within it. The scope of a variable is determined by where it is written in the code
+
+A closure is formed when a function is defined within another function, and the inner function captures and remembers the variables 
+in the outer function's scope, even if the outer function has finished executing.
+
+In summary, lexical scope is about how variable names are resolved based on the physical structure of the code, while closures 
+involve functions retaining access to the variables of their lexical scope even after the outer function has completed execution. 
+
+the window object is a global object that represents the browser window or, in the case of server-side JavaScript environment
+
+ES6:
+Arrow Functions:
+
+Meaning: Arrow functions provide a more concise syntax for defining functions compared to traditional function expressions. They also lexically bind the this value, making it more predictable.
+
+Template Literals:
+
+Meaning: Template literals allow the embedding of expressions inside string literals, making it easier to concatenate variables and create multiline strings.
+Let and Const Declarations:
+
+Meaning: ES6 introduced let and const for variable declarations, providing block-level scoping and making it easier to manage variable lifetimes.
+Use Cases: let is used for variables that can be reassigned, while const is used for constants that should not be reassigned
+Classes:
+
+function greet(message) {
+  console.log(`${message}, ${this.name}!`);
+}
+
+const person = { name: 'John' };
+
+greet.apply(person, ['Hello']);
+
+function greet(message) {
+  console.log(`${message}, ${this.name}!`);
+}
+
+const person = { name: 'John' };
+
+const greetJohn = greet.bind(person, 'Hello');
+greetJohn()
+
+Execution:
+
+apply: Invokes the function immediately.
+bind: Creates a new function with the specified context but doesn't invoke it immediately.
+Return Value:
+
+apply: Returns the result of the function invocation.
+bind: Returns a new function with the specified context.
+Usage:
+
+apply: Useful when the number of arguments is dynamic or unknown, and they are supplied in an array or array-like object.
+bind: Useful when you want to create a partially applied function with a fixed context and, optionally, some pre-specified arguments.
