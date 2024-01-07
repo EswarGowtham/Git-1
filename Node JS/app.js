@@ -4,6 +4,10 @@ const bodyparser=require('body-parser')
 const app=exp()
 const PORT = 4000;
 const path=require('path')
+const errorcontroller=require('./controllers/error');
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 
 const adminRoutes=require('./routes/admin')
 
@@ -14,13 +18,9 @@ app.use(exp.static(path.join(__dirname,'public')))
 app.use('/admin',adminRoutes)
 app.use(shoproutes)
 
-app.use((req,res,next)=>{
- 
-  res.status(404).sendFile(path.join(__dirname,'views','404.html'))
-})
-
 const server = http.createServer(app);
 
+app.use(errorcontroller.get404);
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

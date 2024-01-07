@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/product.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="main-header__nav">
+            <ul class="main-header__item-list">
+                <li class="main-header_item"><a href="/">Shop</a></li>
+                <li class="main-header_item"><a href="/add-product"> Add Product</a></li>
+                <li class="main-header_item"><a class="active" href="/add-product"> Add Product</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form class="product-form" action="/contactus" method="POST">
+            <div class="form-control">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name" required>
+            </div>
+
+            <div class="form-control">
+                <label for="mobile">Mobile</label>
+                <input type="tel" name="mobile" id="mobile" pattern="[0-9]{10}" required>
+                <small>Format: 10-digit number</small>
+            </div>
+
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+
+            <button class="btn" type="submit">Submit</button>
+        </form>
+    </main>
+</body>
+
+</html>
