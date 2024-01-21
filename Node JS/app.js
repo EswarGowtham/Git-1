@@ -8,11 +8,16 @@ const errorcontroller=require('./controllers/error');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-
+const db=require('./util/database')
 const adminRoutes=require('./routes/admin')
 
 const shoproutes=require('./routes/shop')
-
+db.execute('select * from products')
+.then(result=>{
+  console.log(result)
+}).catch(err=>{
+  console.log(err)
+})
 app.use(bodyparser.urlencoded({extended:false}));
 app.use(exp.static(path.join(__dirname,'public')))
 app.use('/admin',adminRoutes)
