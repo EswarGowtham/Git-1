@@ -4,20 +4,12 @@ const bodyparser=require('body-parser')
 const app=exp()
 const PORT = 4000;
 const path=require('path')
+const sequelize=require('./util/database')
 const errorcontroller=require('./controllers/error');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
-const db=require('./util/database')
-const adminRoutes=require('./routes/admin')
 
-const shoproutes=require('./routes/shop')
-db.execute('select * from products')
-.then(result=>{
-  console.log(result)
-}).catch(err=>{
-  console.log(err)
-})
 app.use(bodyparser.urlencoded({extended:false}));
 app.use(exp.static(path.join(__dirname,'public')))
 app.use('/admin',adminRoutes)
@@ -26,6 +18,12 @@ app.use(shoproutes)
 const server = http.createServer(app);
 
 app.use(errorcontroller.get404);
+
+
+sequelize.sync().then(result=>{
+  app.linsten(400)
+})
+.catch(err=>{console.log(err)})
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
