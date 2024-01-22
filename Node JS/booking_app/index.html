@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <form id="myForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="mobile">Mobile:</label>
+        <input type="tel" id="mobile" name="mobile" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <input type="hidden" id="product-id" name="product-id">
+
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+
+    <ul id="submitted-details"></ul>
+
+    <div id="message"></div>
+
+    <script>
+        function submitForm() {
+            var name = document.getElementById("name").value;
+            var mobile = document.getElementById("mobile").value;
+            var email = document.getElementById("email").value;
+            var productId = document.getElementById("product-id").value;
+
+            if (productId) {
+  
+                updateProduct(productId, name, mobile, email);
+            } else {
+
+                addProduct(name, mobile, email);
+            }
+        }
+
+        function addProduct(name, mobile, email) {
+      
+            axios.post('/add-product', {
+                name: name,
+                mobile: mobile,
+                email: email
+            })
+            .then(response => {
+                console.log(response.data);
+
+                fetchAndDisplayProducts();
+      
+                showMessage('Data inserted into the database', 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+     
+                showMessage('Error submitting the form', 'error');
+            });
+
+   
+            document.getElementById("myForm").reset();
+        }
+
+        function updateProduct(productId, name, mobile, email) {
+
+            axios.put(`/update-product/${productId}`, {
+                name: name,
+                mobile: mobile,
+                email: email
+            })
+            .then(response => {
+                console.log(response.data);
+ 
+                fetchAndDisplayProducts();
+    
+                showMessage('Data updated in the database', 'success');
+            })
+            .catch(error => {
+                console.error('Error updating product:', error);
+         
+                showMessage('Error updating the product', 'error');
+            });
+
+            document.getElementById("myForm").reset();
+        }
+
+        function fetchAndDisplayProducts() {
+                   axios.get('/products')
+            .then(response => {
+                var productsList = document.getElementById("submitted-details");
+
+                productsList.innerHTML = "";
+     
+                response.data.forEach(product => {
+                    var listItem = document.createElement("li");
+                    listItem.innerHTML = `<strong>Name:</strong> ${product.name}, <strong>Mobile:</strong> ${product.mobile}, <strong>Email:</strong> ${product.email} ` +
+                        `<button onclick="deleteProduct('${product.id}')">Delete</button> <button onclick="editProduct('${product.id}', '${product.name}', '${product.mobile}', '${product.email}')">Edit</button>`;
+                    productsList.appendChild(listItem);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                showMessage('Error fetching products', 'error');
+            });
+        }
+
+        function deleteProduct(productId) {
+
+            axios.delete(`/delete-product/${productId}`)
+            .then(response => {
+                console.log(response.data);
+
+                fetchAndDisplayProducts();
+
+                showMessage('Data deleted from the database', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting product:', error);
+     
+                showMessage('Error deleting the product', 'error');
+            });
+        }
+
+        function editProduct(id, name, mobile, email) {
+
+            document.getElementById("name").value = name;
+            document.getElementById("mobile").value = mobile;
+            document.getElementById("email").value = email;
+
+            document.getElementById("product-id").value = id;
+        }
+
+        function showMessage(message, type) {
+            var messageElement = document.getElementById("message");
+            messageElement.innerHTML = `<div class="${type}">${message}</div>`;
+
+            setTimeout(() => {
+                messageElement.innerHTML = '';
+            }, 3000);
+        }
+
+        fetchAndDisplayProducts();
+    </script>
+
+</body>
+</html>
