@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Page</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+  
+    h1 {
+      color: #333;
+    }
+  
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+  
+    form label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+    }
+  
+    form input,
+    form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+  
+    form button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  
+    form button:hover {
+      background-color: #45a049;
+    }
+  
+    .blog-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  
+    .blog-box {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      margin: 10px;
+      padding: 15px;
+      width: 200px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+  
+    .blog-box strong {
+      color: #333;
+      font-size: 16px;
+    }
+  
+    .expand-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Blog Page</h1>
+ 
+  <form action="/addBlog" method="post">
+    <label for="author">Author:</label>
+    <input type="text" id="author" name="author" required><br>
+
+    <label for="blogName">Blog Name:</label>
+    <input type="text" id="blogName" name="blogName" required><br>
+
+    <label for="blogDescription">Blog Description:</label>
+    <textarea id="blogDescription" name="description" required></textarea><br>
+
+    <button type="submit">Add Blog</button>
+  </form>
+  <ul id="submitted-details"></ul>
+  <div class="blog-container" id="blogContainer"></div>
+
+  <!-- index.html -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function addBlog(author, title, description) {
+        
+            axios.post('/addBlog', {
+                author: name,
+                title: mobile,
+                description: description
+            })
+            .then(response => {
+                console.log(response.data);
+
+                fetchAndDisplayProducts();
+    
+            })
+            .catch(error => {
+                console.log('Error:', error);
+            });
+
+
+            document.getElementById("myForm").reset();
+        }
+        function submitForm() {
+            var author = document.getElementById("author").value;
+            var title = document.getElementById("blogName").value;
+            var description = document.getElementById("description").value;
+            var blogId = document.getElementById("blog-id").value;
+
+            if (blogId) {
+
+                updateProduct(productId, name, mobile, email);
+            } else {
+
+                addProduct(name, mobile, email);
+            }
+        }
+        function fetchAndDisplayBlogs() {
+            axios.get('/blogs')
+              .then(response => {
+                const blogs = response.data;
+          
+                if (Array.isArray(blogs)) {
+                  var blogContainer = document.getElementById("blogContainer");
+                  blogContainer.innerHTML = "";
+                  
+                  blogs.forEach(blog => {
+                    var blogBox = document.createElement("div");
+                    blogBox.className = "blog-box";
+                    var blogId = `blog${blog.id}`;
+                    blogBox.innerHTML = `<strong>Blog Name:</strong> ${blog.title}
+                    <button class="expand-button" onclick="expandBlog('${blogId}')">Expand</button>`;
+          
+                    var detailsDiv = document.createElement("div");
+                    detailsDiv.className = "hidden";
+                    detailsDiv.innerHTML = `<strong>Author:</strong> ${blog.author}, <strong>Description:</strong> ${blog.description}`;
+          
+                    blogBox.id = blogId;
+
+                    blogBox.appendChild(detailsDiv);
+                    blogContainer.appendChild(blogBox);
+                  });
+                } else {
+                  console.error('Invalid or missing data in the response:', blogs);
+                }
+              })
+              .catch(error => {
+                console.error('Error fetching blogs:', error);
+              });
+              
+          }
+          function submitComment(blogId) {
+            var commentInput = document.getElementById(`comment${blogId}`);
+            var comment = commentInput.value.trim();
+          
+            if (comment) {
+              // Assuming you have a server-side endpoint for adding comments
+              axios.post(`/addComment/${blogId}`, { comment })
+                .then(response => {
+                  console.log(response.data);
+          
+                  // Clear the input field after submitting
+                  commentInput.value = '';
+          
+                  // Fetch and display updated comments
+                  fetchAndDisplayComments(blogId);
+                })
+                .catch(error => {
+                  console.error('Error submitting comment:', error);
+                });
+            }
+          }
+          
+          
+          function expandBlog(blogId) {
+            var detailsDiv = document.querySelector(`#${blogId} .hidden`);
+            if (detailsDiv) {
+              detailsDiv.classList.toggle("hidden");
+          
+              // Add a form for comments
+              detailsDiv.innerHTML += `
+                <form id="commentForm${blogId}" onsubmit="submitComment('${blogId}'); return false;">
+                  <label for="comment">Add a Comment:</label>
+                  <input type="text" id="comment${blogId}" name="comment" required>
+                  <button type="submit">Submit</button>
+                </form>
+                <div id="commentsContainer${blogId}"></div>
+              `;
+                        // Fetch and display existing comments
+              fetchAndDisplayComments(blogId);
+            }
+          }
+        fetchAndDisplayBlogs();
+    </script>
+
+
+</body>
+</html>
